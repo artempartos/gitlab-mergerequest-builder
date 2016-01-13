@@ -1,2 +1,2 @@
 install:
-	mvn -s settings.xml install hpi:run
+	mvn -s settings.xml install -DskipTests
