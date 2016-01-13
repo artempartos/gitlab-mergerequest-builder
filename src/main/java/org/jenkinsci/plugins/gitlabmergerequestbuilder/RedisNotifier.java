@@ -8,7 +8,7 @@ import hudson.model.GitlabCause;
 import hudson.model.RunOnceProject;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Notifier;
-import hudson.tasks.test.AbstractTestResultAction;
+import hudson.tasks.junit.TestResultAction;
 import jenkins.model.Jenkins;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.kohsuke.stapler.export.*;
@@ -23,7 +23,7 @@ import java.util.logging.Logger;
 public class RedisNotifier extends Notifier {
 
     private static final String REDIS_KEY = "resque:gitlab:queue:build_result";
-    private static final String DEFAULT_REDIS_HOST = "localhost";
+    private static final String DEFAULT_REDIS_HOST = "redis";
     private static final int DEFAULT_REDIS_PORT = 6379;
 
     private static final Logger logger = Logger.getLogger(RedisNotifier.class.getName());
@@ -62,7 +62,8 @@ public class RedisNotifier extends Notifier {
         String consoleLog = Utils.escape(stringWriter.toString());
 
         String testResultJson = "null";
-        AbstractTestResultAction testResult = build.getTestResultAction();
+        logger.info(stringWriter.toString());
+        TestResultAction testResult = build.getAction(TestResultAction.class);
         if (testResult != null) {
             logger.info("Found test results. Serializing to JSON.");
 
@@ -85,7 +86,6 @@ public class RedisNotifier extends Notifier {
                 coverageJson = resultsetFile.readToString();
             }
         }
-
         RunOnceProject.DescriptorImpl descriptor = Jenkins.getInstance().
                 getDescriptorByType(RunOnceProject.DescriptorImpl.class);
 
